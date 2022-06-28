@@ -15,7 +15,7 @@ public class springIocByReflection {
         public static Properties getPro() throws FileNotFoundException, IOException {
             Properties pro=new Properties();
             // 定义配置之类的文件
-            File f=new File("com.example.learningdemo.reflection_7.springIOCbyRefluction.fruit1.properties");
+            File f=new File("fruit.properties");
             //if(f.exists()){
                 pro.load(new FileInputStream(f));
            /* }else{
