@@ -1,4 +1,4 @@
-package com.example.learningdemo.Exception;
+package com.example.learningdemo.Exception_8;
 
 public class MyException extends Exception {
     private int detail;

@@ -1,4 +1,4 @@
-package com.example.learningdemo.Exception;
+package com.example.learningdemo.Exception_8;
 
 public class testThrow {
     // 嵌套捕获时如果外层也有符合捕获条件时也会捕获
