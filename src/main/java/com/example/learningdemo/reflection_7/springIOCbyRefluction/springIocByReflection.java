@@ -10,7 +10,7 @@ public class springIocByReflection {
     // 现在就算我们添加任意多个子类的时候，工厂类都不需要修改。
     // 使用反射机制实现的工厂模式可以通过反射取得接口的实例，但是需要传入完整的包和类名。
     // 而且用户也无法知道一个接口有多少个可以使用的子类，所以我们通过属性文件的形式配置所需要的子类。
-    //下面编写使用反射机制并结合属性文件的工厂模式（即IoC）。
+    // 下面编写使用反射机制并结合属性文件的工厂模式（即IoC）。
     static class  init{
         public static Properties getPro() throws FileNotFoundException, IOException {
             Properties pro=new Properties();
