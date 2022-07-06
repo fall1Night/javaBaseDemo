@@ -1,16 +1,15 @@
 package com.example.learningdemo.Thread_12;
 
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /*
     线程
-一、有三种使用线程的方法：
+一、有四种使用线程的方法：
     实现 Runnable 接口；
     实现 Callable 接口；
     继承 Thread 类。
+    通过线程池创建线程。
     实现 Runnable 和 Callable 接口的类只能当做一个可以在线程中运行的任务，不是真正意义上的线程，因此最后还需要通过 Thread 来调用。可以理解为任务是通过线程驱动从而执行的。
     实现接口与继承创建线程的区别:实现接口会更好一些，因为：Java 不支持多重继承，因此继承了 Thread 类就无法继承其它类，但是可以实现多个接口；类可能只要求可执行就行，继承整个 Thread 类开销过大。
 二、线程的状态
@@ -23,9 +22,17 @@ import java.util.concurrent.FutureTask;
     4.等待(WAITING)：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。
     5.超时等待(TIMED_WAITING)：该状态不同于WAITING，它可以在指定的时间后自行返回。
     6. 终止(TERMINATED)：表示该线程已经执行完毕。
+三、Executors
+    Executors 是一个Java中的工具类。提供工厂方法来创建不同类型的线程池。
+    newFiexedThreadPool(int Threads)：创建固定数目线程的线程池。
+    newCachedThreadPool()：创建一个可缓存的线程池，调用execute 将重用以前构造的线程（如果线程可用）。如果没有可用的线程，则创建一个新线程并添加到池中。终止并从缓存中移除那些已有 60 秒钟未被使用的线程。
+    newSingleThreadExecutor()创建一个单线程化的Executor。
+    newScheduledThreadPool(int corePoolSize)创建一个支持定时及周期性的任务执行的线程池，多数情况下可用来替代Timer类。
+    ---------------------------------但尽量不要用Executors创建线程,推荐ThreadPoolExecutor----------------------------------------------------------------------
+    因为使用Executors创建线程池可能会导致OOM(OutOfMemory ,内存溢出)详见ExecutorsDemo
 * */
 public class ThreadTest {
-    public static void main(String[] args) throws InterruptedException,ExecutionException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         //  使用 Runnable 实例再创建一个 Thread 实例，然后调用 Thread 实例的 start() 方法来启动线程。
         System.out.println("通过实现runnable接口创建线程-------------------------------------------------------");
         MyRunnable instance = new MyRunnable();
@@ -46,24 +53,58 @@ public class ThreadTest {
         System.out.println("通过继承Thread创建线程-------------------------------------------------------");
         MyThread mt = new MyThread();
         mt.start();
+
+        //通过线程池创建线程
+        //所谓线程池本质是一个hashSet。多余的任务会放在阻塞队列中。
+        //线程池的创建方式其实也有很多，也可以通过Executors静态工厂构建，但一般不建议。建议使用线程池来创建线程，
+        // 并且建议使用带有ThreadFactory参数的ThreadPoolExecutor（需要依赖guava）构造方法设置线程名字
+        System.out.println("通过创建线程池创建线程-------------------------------------------------------");
+        //打印当前线程名称
+        System.out.println(Thread.currentThread().getName());
+        // 创建线程池  推荐此方法创建线程
+        ExecutorService executorService = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10));
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                //打印当前线程名称
+                System.out.println(Thread.currentThread().getName());
+                System.out.println("已通过线程池创建线程");
+            }
+        });
+
+        //ExecutorService是Executors的代理对象,详见代理模式
+        //通过Executors.newCachedThreadPool()创建线程池
+        //  不推荐此方法创建线程
+        System.out.println("通过通过Executors.newXXXXX()创建线程池创建线程-------------------------------------------------------");
+        ExecutorService executorServiceByExecutors = Executors.newCachedThreadPool();
+        for (int i = 0; i < 5; i++) {
+            executorServiceByExecutors.execute(new MyRunnable());
+        }
+        executorServiceByExecutors.shutdown();
+
+
+
     }
 
 }
+
 //实现 Runnable 接口,需要实现接口中的 run() 方法。
- class MyRunnable implements Runnable {
+class MyRunnable implements Runnable {
     @Override
     public void run() {
         System.out.println("MyRunnable跑起来了");
     }
 }
+
 //实现 Callable 接口,与 Runnable 相比，Callable 可以有返回值，返回值通过 FutureTask 进行封装。
- class MyCallable implements Callable<Integer> {
+class MyCallable implements Callable<Integer> {
     public Integer call() {
         return 123;
     }
 }
+
 //继承 Thread 类
- class MyThread extends Thread {
+class MyThread extends Thread {
     public void run() {
         System.out.println("继承Thread跑起来了");
     }
