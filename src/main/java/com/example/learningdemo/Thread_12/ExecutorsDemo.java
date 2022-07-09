@@ -4,8 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-/*
-* Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
+/** Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
     at java.util.concurrent.LinkedBlockingQueue.offer(LinkedBlockingQueue.java:416)
     at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:1371)
     at com.hollis.ExecutorsDemo.main(ExecutorsDemo.java:16)
