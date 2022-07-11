@@ -30,6 +30,20 @@ import java.util.concurrent.*;
     newScheduledThreadPool(int corePoolSize)创建一个支持定时及周期性的任务执行的线程池，多数情况下可用来替代Timer类。
     ---------------------------------但尽量不要用Executors创建线程,推荐ThreadPoolExecutor----------------------------------------------------------------------
     因为使用Executors创建线程池可能会导致OOM(OutOfMemory ,内存溢出)详见ExecutorsDemo
+
+    Daemon
+    守护线程是程序运行时在后台提供服务的线程，不属于程序中不可或缺的部分。
+    当所有非守护线程结束时，程序也就终止，同时会杀死所有守护线程。
+    main() 属于非守护线程。
+    在线程启动之前使用 setDaemon() 方法可以将一个线程设置为守护线程。
+
+    sleep()
+    Thread.sleep(millisec) 方法会休眠当前正在执行的线程，millisec 单位为毫秒。
+    sleep() 可能会抛出 InterruptedException，因为异常不能跨线程传播回 main() 中，因此必须在本地进行处理。线程中抛出的其它异常也同样需要在本地进行处理。
+
+    yield()
+    对静态方法 Thread.yield() 的调用声明了当前线程已经完成了生命周期中最重要的部分，可以切换给其它线程来执行。
+    该方法只是对线程调度器的一个建议，而且也只是建议具有相同优先级的其它线程可以运行。
 * */
 public class ThreadTest {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
@@ -38,6 +52,15 @@ public class ThreadTest {
         MyRunnable instance = new MyRunnable();
         Thread threadRunnable = new Thread(instance);
         threadRunnable.start();
+
+        // 将线程开启守护线程
+        threadRunnable.setDaemon(true);
+        // 休眠当前线程300ms
+        Thread.sleep(300);
+        // 建议切换其他线程执行
+        Thread.yield();
+
+
 
         //使用 Callable 实例创建一个 Thread 实例,与runnable区别为可以又返回值,返回值通过 FutureTask 进行封装。
         System.out.println("通过实现Callable接口创建线程-------------------------------------------------------");
@@ -71,7 +94,6 @@ public class ThreadTest {
                 System.out.println("已通过线程池创建线程");
             }
         });
-
         //ExecutorService是Executors的代理对象,详见代理模式
         //通过Executors.newCachedThreadPool()创建线程池
         //  不推荐此方法创建线程
