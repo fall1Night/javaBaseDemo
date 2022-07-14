@@ -29,12 +29,6 @@ public class reflectDemoTest {
     public String test1() {
         return "11111";
 
-
-
-
     }
-
-
-
 
 }
