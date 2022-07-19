@@ -3,7 +3,7 @@ package com.example.learningdemo.Thread_12;
 
 import java.util.concurrent.*;
 
-/*
+/**
     线程
 一、有四种使用线程的方法：
     实现 Runnable 接口；
@@ -56,10 +56,48 @@ import java.util.concurrent.*;
     因此可以在循环体中使用 interrupted() 方法来判断线程是否处于中断状态，从而提前结束线程。
     Executor 的中断操作
     调用 Executor 的 shutdown() 方法会等待线程都执行完毕之后再关闭，但是如果调用的是 shutdownNow() 方法，则相当于调用每个线程的 interrupt() 方法。
-    以下使用 Lambda 创建线程，相当于创建了一个匿名内部线程。\
+    以下使用 Lambda 创建线程，相当于创建了一个匿名内部线程。
 五、互斥同步
     同步锁synchronized
+六、线程之间的协作
+    1.join()
+    在线程中调用另一个线程的 join() 方法，会将当前线程挂起，而不是忙等待，直到目标线程结束。
+    2.wait() notify() notifyAll()
+    调用 wait() 使得线程等待某个条件满足，线程在等待时会被挂起，当其他线程的运行使得这个条件满足时，其它线程会调用 notify() 或者 notifyAll() 来唤醒挂起的线程。
+    它们都属于 Object 的一部分，而不属于 Thread。
+    只能用在同步方法或者同步控制块中使用，否则会在运行时抛出 IllegalMonitorStateException。
+    使用 wait() 挂起期间，线程会释放锁。这是因为，如果没有释放锁，那么其它线程就无法进入对象的同步方法或者同步控制块中，那么就无法执行 notify() 或者 notifyAll() 来唤醒挂起的线程，造成死锁。
+    3.wait() 和 sleep() 的区别
+    wait() 是 Object 的方法，而 sleep() 是 Thread 的静态方法；
+    wait() 会释放锁，sleep() 不会。
+七、线程状态
+    1.新建（NEW）
+    创建后尚未启动。
+    2.可运行（RUNABLE）
+    正在 Java 虚拟机中运行。但是在操作系统层面，它可能处于运行状态，也可能等待资源调度（例如处理器资源），资源调度完成就进入运行状态。所以该状态的可运行是指可以被运行，具体有没有运行要看底层操作系统的资源调度。
+    3.阻塞（BLOCKED）
+    请求获取 monitor lock 从而进入 synchronized 函数或者代码块，但是其它线程已经占用了该 monitor lock，所以出于阻塞状态。要结束该状态进入从而 RUNABLE 需要其他线程释放 monitor lock。
+    4.无限期等待（WAITING）
+    等待其它线程显式地唤醒。
+    阻塞和等待的区别在于，阻塞是被动的，它是在等待获取 monitor lock。而等待是主动的，通过调用 Object.wait() 等方法进入。
 
+                进入方法	                                          退出方法
+    没有设置 Timeout 参数的 Object.wait() 方法	        Object.notify() / Object.notifyAll()
+    没有设置 Timeout 参数的 Thread.join() 方法	        被调用的线程执行完毕
+    LockSupport.park() 方法	                        LockSupport.unpark(Thread)
+
+    5.限期等待（TIMED_WAITING）
+    无需等待其它线程显式地唤醒，在一定时间之后会被系统自动唤醒。
+
+            进入方法	                                                退出方法
+    Thread.sleep() 方法	                                            时间结束
+    设置了 Timeout 参数的 Object.wait() 方法	        时间结束 / Object.notify() / Object.notifyAll()
+    设置了 Timeout 参数的 Thread.join() 方法	                时间结束 / 被调用的线程执行完毕
+    LockSupport.parkNanos() 方法	                            LockSupport.unpark(Thread)
+    LockSupport.parkUntil() 方法	                            LockSupport.unpark(Thread)
+
+    6.死亡（TERMINATED）
+    可以是线程结束任务之后自己结束，或者产生了异常而结束。
 * */
 public class ThreadTest {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
@@ -168,10 +206,48 @@ public class ThreadTest {
         ExecutorService ExecutorBySynchronized1 = Executors.newCachedThreadPool();
         ExecutorBySynchronized1.execute(() -> ThreadBySynchronized1.synchronizedTest());
         ExecutorBySynchronized1.execute(() -> ThreadBySynchronized2.synchronizedTest());
+
+        System.out.println("测试join()方法-------------------------------------------------------------------------");
+        //对于以下代码，虽然 b 线程先启动，但是因为在 b 线程中调用了 a 线程的 join() 方法，b 线程会等待 a 线程结束才继续执行，
+        // 因此最后能够保证 a 线程的输出先于 b 线程的输出。
+        A a = new A();
+        B b = new B(a);
+        b.start();
+        a.start();
+
+        System.out.println("测试wait() notify() notifyAll()方法-------------------------------------------------------------------------");
+        ExecutorService testWaitNotify = Executors.newCachedThreadPool();
+        ThreadTest threadTest = new ThreadTest();
+        // after中线程进入wait状态,下一行调用before()唤醒线程after()继续执行
+        testWaitNotify.execute(() -> threadTest.after());
+        testWaitNotify.execute(() -> threadTest.before());
+
+
+
+
+
+
+        System.out.println("线程不安全示例-------------------------------------------------------------------------");
+        // 如果多个线程对同一个共享数据进行访问而不采取同步操作的话，那么操作的结果是不一致的。
+        final int threadSize = 1000;
+        ThreadUnsafeExample example = new ThreadUnsafeExample();
+        final CountDownLatch countDownLatch = new CountDownLatch(threadSize);
+        ExecutorService executorServiceUnSafe = Executors.newCachedThreadPool();
+        for (int i = 0; i < threadSize; i++) {
+            executorServiceUnSafe.execute(() -> {
+                // add()方法添加同步锁synchronized可保证累加为1000
+                example.add();
+                countDownLatch.countDown();
+            });
+        }
+        countDownLatch.await();
+        executorServiceUnSafe.shutdown();
+        System.out.println(example.get());
+
     }
 
 
-    // 测试synchronized同步锁
+    // 测试synchronized同步锁(同步代码块)
     public void synchronizedTest() {
         synchronized (this) {
             for (int i = 0; i < 10; i++) {
@@ -179,11 +255,27 @@ public class ThreadTest {
             }
         }
     }
-
+    // 同步方法
     public synchronized void CommonTest() {
         for (int i = 0; i < 10; i++) {
             System.out.print(i + " ");
         }
+    }
+
+
+    // 测试wait() notify() notifyAll()
+    public synchronized void before() {
+        System.out.println("before");
+        notifyAll();
+    }
+
+    public synchronized void after() {
+        try {
+            wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("after");
     }
 }
 
@@ -234,3 +326,44 @@ class MyThreadInterrupted extends Thread {
 }
 
 
+// 此处测试使用线程join()方法
+class A extends Thread {
+    @Override
+    public void run() {
+        System.out.println("A run");
+    }
+}
+
+class B extends Thread {
+
+    private A a;
+
+    B(A a) {
+        this.a = a;
+    }
+
+    @Override
+    public void run() {
+        try {
+            a.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("B run");
+    }
+}
+
+// 测试线程不安全示例
+ class ThreadUnsafeExample {
+
+    private int cnt = 0;
+
+    //public synchronized void add() {
+    public synchronized void add() {
+        cnt++;
+    }
+
+    public int get() {
+        return cnt;
+    }
+}
