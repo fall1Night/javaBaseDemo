@@ -58,6 +58,8 @@ import java.util.concurrent.*;
     调用 Executor 的 shutdown() 方法会等待线程都执行完毕之后再关闭，但是如果调用的是 shutdownNow() 方法，则相当于调用每个线程的 interrupt() 方法。
     以下使用 Lambda 创建线程，相当于创建了一个匿名内部线程。
 五、互斥同步
+    互斥同步属于一种悲观的并发策略，总是认为只要不去做正确的同步措施，那就肯定会出现问题。无论共享数据是否真的会出现竞争，
+    它都要进行加锁（这里讨论的是概念模型，实际上虚拟机会优化掉很大一部分不必要的加锁）、用户态核心态转换、维护锁计数器和检查是否有被阻塞的线程需要唤醒等操作。
     同步锁synchronized
 六、线程之间的协作
     1.join()
@@ -244,6 +246,16 @@ public class ThreadTest {
         executorServiceUnSafe.shutdown();
         System.out.println(example.get());
 
+
+
+
+        System.out.println("局部变量线程安全-------------------------------------------------------------------------");
+        StackClosedExample exampleByVariable = new StackClosedExample();
+        ExecutorService executorByVariable = Executors.newCachedThreadPool();
+        executorByVariable.execute(() -> exampleByVariable.add100());
+        executorByVariable.execute(() -> exampleByVariable.add100());
+        executorService.shutdown();
+
     }
 
 
@@ -365,5 +377,19 @@ class B extends Thread {
 
     public int get() {
         return cnt;
+    }
+}
+
+//  多个线程访问同一个方法的局部变量时，不会出现线程安全问题，因为局部变量存储在虚拟机栈中，属于线程私有的。
+ class StackClosedExample {
+    public void add100() {
+        int cnt = 0;
+        Integer integer=0;
+        for (int i = 0; i < 100; i++) {
+            cnt++;
+            integer++;
+        }
+        System.out.println(cnt);
+        System.out.println("局部变量为引用类型时"+integer);
     }
 }
