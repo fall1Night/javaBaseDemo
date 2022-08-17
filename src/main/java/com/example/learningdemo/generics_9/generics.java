@@ -1,5 +1,10 @@
 package com.example.learningdemo.generics_9;
 
+import com.example.learningdemo.pojo.Student;
+import com.example.learningdemo.pojo.Person;
+import org.springframework.beans.BeanUtils;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -42,6 +47,16 @@ public class generics {
         System.out.println(generic.getKey());
         System.out.println(generic2.getKey());
         System.out.println(generic4.getKey());
+
+        List<Person> personList=new ArrayList<>();
+        personList.add(new Person("小红",1));
+        personList.add(new Person("小明",2));
+        personList.add(new Person("小白",3));
+        List<Student>studentList=new ArrayList<>();
+        Generic.copyProperty(personList,studentList,Student.class);
+        System.out.println(studentList);
+
+
     }
 
 
@@ -109,6 +124,26 @@ public class generics {
         public <T> T genericMethod(Class<T> tClass)throws InstantiationException , IllegalAccessException{
             T instance = tClass.newInstance();
             return instance;
+        }
+        
+        /***
+         * @Author sxc
+         * @Description 集合属性拷贝u
+         * @Date  2022/8/17
+         * @Return void
+         */
+        static <T,K>void copyProperty(List<K> sourceList, List<T> targetList,Class<T> targetClass){
+            for (K k : sourceList) {
+                try {
+                    T a=targetClass.newInstance();
+                    BeanUtils.copyProperties(k,a);
+                    targetList.add(a);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 public static class StaticGenerator<T> {
