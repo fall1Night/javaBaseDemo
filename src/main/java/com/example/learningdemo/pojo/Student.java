@@ -14,6 +14,7 @@ public class Student extends Person {
         return major;
     }
 
+
     public void setMajor(String major) {
         this.major = major;
     }@Override
