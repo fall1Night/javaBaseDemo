@@ -24,7 +24,6 @@ public class Student extends Person {
                 ", major='" + major + '\'' +
                 '}';
     }
-
     public String getMajor(String major) {
         return "This student major" + major;
     }
