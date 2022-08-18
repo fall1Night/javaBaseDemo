@@ -10,15 +10,17 @@ public class Student extends Person {
     public Student(String name, Integer age, String major) {
         super(name, age);
         this.major = major;
-    }public String getMajor() {
+    }
+
+    public String getMajor() {
         return major;
     }
 
-
     public void setMajor(String major) {
         this.major = major;
-    }@Override
+    }
 
+    @Override
     public String toString() {
         return "Student{" +
                 "name='" + name + '\'' +
@@ -26,6 +28,7 @@ public class Student extends Person {
                 ", major='" + major + '\'' +
                 '}';
     }
+
     public String getMajor(String major) {
         return "This student major" + major;
     }
