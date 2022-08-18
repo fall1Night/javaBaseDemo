@@ -11,6 +11,7 @@ public class Student extends Person{
         this.major = major;
     }
 
+
     public String getMajor() {
         return major;
     }
