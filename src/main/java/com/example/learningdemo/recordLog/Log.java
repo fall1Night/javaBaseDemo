@@ -7,6 +7,15 @@ public class Log {
     private String ParamChineseName;
     private String oldParam;
     private String newParam;
+    private String msg;
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
     public String getId() {
         return id;

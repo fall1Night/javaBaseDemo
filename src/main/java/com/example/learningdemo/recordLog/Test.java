@@ -11,17 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 public class Test implements Serializable {
-
     @FieldCompare(chineseName = "线上")
     private String servicePriceOnline;
 
+    @FieldCompare(chineseName = "线下")
+    private BigDecimal servicePriceOffline;
 
     @FieldCompare(chineseName = "服务费收取方式", properties = "1:固定金额,2:百分比")
     private Integer serviceFeeCollectWay;
 
-
-    @FieldCompare(chineseName = "线下")
-    private BigDecimal servicePriceOffline;
 
     private Integer id;
 
@@ -89,12 +87,19 @@ public class Test implements Serializable {
 
 
     public static void main(String[] args) throws Exception {
+
+
+        BigDecimal bigDecimal = BigDecimal.valueOf(1);
+        BigDecimal bigDecimal2 = BigDecimal.valueOf(2);
         Test newTest = new Test();
         newTest.setServiceFeeCollectWay(1);
         newTest.setServicePriceOnline("222");
+        newTest.setServicePriceOffline(bigDecimal);
+
         Test oldTest = new Test();
         oldTest.setServiceFeeCollectWay(2);
-        oldTest.setServicePriceOnline("111");
+        //oldTest.setServicePriceOnline("111");
+        //oldTest.setServicePriceOffline(bigDecimal2);
         List<Map<String, Object>> compareLog = SerializableFieldCompare.compare(Test.class, newTest, oldTest);
         List<Log> logList = new ArrayList<>();
         for (Map<String, Object> stringObjectMap : compareLog) {

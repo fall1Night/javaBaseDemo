@@ -33,27 +33,57 @@ public class SerializableFieldCompare {
                     break;
                 }
                 boolean eq = false;
-                if (oldVal instanceof String) {
-                    String s1 = String.valueOf(oldVal).trim();
-                    String s2 = String.valueOf(newVal).trim();
-                    eq = !s1.equals(s2);
-                } else if (oldVal instanceof Integer) {
-                    int i1 = (Integer) oldVal;
-                    int i2 = (Integer) newVal;
-                    eq = i1 != i2;
-                } else if (oldVal instanceof Double) {
-                    double d1 = (Double) oldVal;
-                    double d2 = (Double) newVal;
-                    eq = d1 != d2;
-                } else if (oldVal instanceof BigDecimal) {
-                    BigDecimal b1 = (BigDecimal) oldVal;
-                    BigDecimal b2 = (BigDecimal) newVal;
-                    eq = b1.compareTo(b2) != 0;
-                } else if (oldVal instanceof Long) {
-                    long l1 = (Long) oldVal;
-                    long l2 = (Long) newVal;
-                    eq = l1 != l2;
+                if (oldVal != null) {
+                    if (oldVal instanceof String) {
+                        String s1 = String.valueOf(oldVal).trim();
+                        String s2 = String.valueOf(newVal).trim();
+                        eq = !s1.equals(s2);
+                    } else if (oldVal instanceof Integer) {
+                        int i1 = (Integer) oldVal;
+                        int i2 = (Integer) newVal;
+                        eq = i1 != i2;
+                    } else if (oldVal instanceof Double) {
+                        double d1 = (Double) oldVal;
+                        double d2 = (Double) newVal;
+                        eq = d1 != d2;
+                    } else if (oldVal instanceof BigDecimal) {
+                        BigDecimal b1 = (BigDecimal) oldVal;
+                        BigDecimal b2 = (BigDecimal) newVal;
+                        eq = b1.compareTo(b2) != 0;
+                    } else if (oldVal instanceof Long) {
+                        long l1 = (Long) oldVal;
+                        long l2 = (Long) newVal;
+                        eq = l1 != l2;
+                    }
+                } else {
+                    if (newVal instanceof String) {
+                        String s1 = String.valueOf(newVal).trim();
+                        String s2 = String.valueOf(oldVal).trim();
+                        eq = !s1.equals(s2);
+                    } else if (newVal instanceof Integer) {
+                        int i1 = (Integer) newVal;
+                        int i2 = (Integer) oldVal;
+                        eq = i1 != i2;
+                    } else if (newVal instanceof Double) {
+                        double d1 = (Double) newVal;
+                        double d2 = (Double) oldVal;
+                        eq = d1 != d2;
+                    } else if (newVal instanceof BigDecimal) {
+                        BigDecimal b1 = (BigDecimal) newVal;
+                        BigDecimal b2 = (BigDecimal) oldVal;
+                        if (oldVal == null) {
+                            eq = true;
+
+                        } else {
+                            eq = b1.compareTo(b2) != 0;
+                        }
+                    } else if (newVal instanceof Long) {
+                        long l1 = (Long) newVal;
+                        long l2 = (Long) oldVal;
+                        eq = l1 != l2;
+                    }
                 }
+
                 String s1 = oldVal == null ? "" : oldVal.toString().trim();
                 String s2 = newVal == null ? "" : newVal.toString().trim();
                 if (eq) {
