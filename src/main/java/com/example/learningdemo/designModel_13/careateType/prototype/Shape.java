@@ -1,5 +1,8 @@
 package com.example.learningdemo.designModel_13.careateType.prototype;
 
+/**
+ * 实现Cloneable,重写clone方法,不实现时clone则会报CloneNotSupportedException错误
+ */
 public abstract class Shape implements Cloneable {
 
     private String id;
