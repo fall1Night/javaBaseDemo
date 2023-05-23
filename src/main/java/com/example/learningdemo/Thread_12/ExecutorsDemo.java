@@ -3,7 +3,10 @@ package com.example.learningdemo.Thread_12;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /** Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
     at java.util.concurrent.LinkedBlockingQueue.offer(LinkedBlockingQueue.java:416)
@@ -26,48 +29,73 @@ public class ExecutorsDemo {
 
 
     // 此方法创建线程没做限制的话会出现内存溢出错误
-    /**Executor 管理多个异步任务的执行，而无需程序员显式地管理线程的生命周期。这里的异步是指多个任务的执行互不干扰，不需要进行同步操作。
-     主要有三种 Executor：
-     CachedThreadPool：一个任务创建一个线程；
-     FixedThreadPool：所有任务只能使用固定大小的线程；
-     SingleThreadExecutor：相当于大小为 1 的 FixedThreadPool。
-     * */
+    /**
+     * Executor 管理多个异步任务的执行，而无需程序员显式地管理线程的生命周期。这里的异步是指多个任务的执行互不干扰，不需要进行同步操作。
+     * 主要有三种 Executor：
+     * CachedThreadPool：一个任务创建一个线程；
+     * FixedThreadPool：所有任务只能使用固定大小的线程；
+     * SingleThreadExecutor：相当于大小为 1 的 FixedThreadPool。
+     */
     private static ExecutorService executor = Executors.newFixedThreadPool(15);
     private static ExecutorService executorByNewCachedThreadPool = Executors.newCachedThreadPool();
     private static ExecutorService executorByNewSingleThreadExecutor = Executors.newSingleThreadExecutor();
 
 
-    public static void main(String[] args) {
-        // 此处ExecutorService.execute()方法调用的为自定义的线程
-        executorByNewCachedThreadPool.execute(new MyRunnable());
-        executorByNewSingleThreadExecutor.execute(new MyThread());
-//        executorByNewSingleThreadExecutor.execute(new SubThread());
+//    public static void main(String[] args) {
+//        // 此处ExecutorService.execute()方法调用的为自定义的线程
+//        executorByNewCachedThreadPool.execute(new MyRunnable());
+//        executorByNewSingleThreadExecutor.execute(new MyThread());
+////        executorByNewSingleThreadExecutor.execute(new SubThread());
+//
+//
+//
+//
+//        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+//            executor.execute(new SubThread());
+//            System.out.println(i);
+//        }
+//
+//
+//z
+//        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+//            pool.execute(new SubThread());
+//        }
+//    }
+//}
+
+    static <T> Predicate<T> distinctByKey1(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
 
 
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                    System.out.println("I am running");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        TimeUnit.SECONDS.sleep(2);
+        System.out.println("the main thread ready to exit");
 
 
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-            executor.execute(new SubThread());
-            System.out.println(i);
-        }
+    }
 
-
-
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-            pool.execute(new SubThread());
+    class SubThread implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                //do nothing
+            }
         }
     }
 }
-
-class SubThread implements Runnable {
-    @Override
-    public void run() {
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            //do nothing
-        }
-    }
-}
-
 

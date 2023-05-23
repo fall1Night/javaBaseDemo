@@ -12,9 +12,6 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class WordWaterMarker {
@@ -101,8 +98,8 @@ public class WordWaterMarker {
         CTGroup group = CTGroup.Factory.newInstance();
         CTShapetype shapetype = group.addNewShapetype();
         CTTextPath shapeTypeTextPath = shapetype.addNewTextpath();
-        shapeTypeTextPath.setOn(STTrueFalse.T);
-        shapeTypeTextPath.setFitshape(STTrueFalse.T);
+//        shapeTypeTextPath.setOn(STTrueFalse.T);
+//        shapeTypeTextPath.setFitshape(STTrueFalse.T);
         CTLock lock = shapetype.addNewLock();
         lock.setExt(STExt.VIEW);
         CTShape shape = group.addNewShape();
@@ -111,7 +108,7 @@ public class WordWaterMarker {
         shape.setType("#_x0000_t136");
         shape.setStyle(getShapeStyle()); // 设置形状样式（旋转，位置，相对路径等参数）
         shape.setFillcolor(fontColor);
-        shape.setStroked(STTrueFalse.FALSE); // 字体设置为实心
+//        shape.setStroked(STTrueFalse.FALSE); // 字体设置为实心
         CTTextPath shapeTextPath = shape.addNewTextpath(); // 绘制文本的路径
         shapeTextPath.setStyle("font-family:" + fontName + ";font-size:" + fontSize); // 设置文本字体与大小
         shapeTextPath.setString(customText);
