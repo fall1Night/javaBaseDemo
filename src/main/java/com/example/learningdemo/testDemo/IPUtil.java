@@ -12,7 +12,7 @@ public class IPUtil {
     public static String getAddressByIp(String ip) {
         try {
             //db
-            URL url = IPUtil.class.getClassLoader().getResource("ip2region.db");
+            URL url = IPUtil.class.getClassLoader().getResource("ip2region.xdb");
             String dbPath = url.getFile();
             File file = new File(url.getFile());
             if (file.exists() == false) {
@@ -43,6 +43,7 @@ public class IPUtil {
             }
             dataBlock = (DataBlock) method.invoke(searcher, ip);*/
             DataBlock dataBlock = searcher.btreeSearch(ip);
+//            DataBlock dataBlock = searcher.binarySearch(ip);
             //address格式：中国|0|广东省|深圳市|电信
             String address = dataBlock.getRegion();
             //下两行 防止截取报错 在本方法catch

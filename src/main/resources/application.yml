@@ -1,0 +1,20 @@
+# 应用名称
+spring:
+  application:
+    name=learningDemo:
+  ## 定时任务设置
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: MyScheduler
+            instanceId: AUTO
+        threadPool:
+          threadCount: 3
+          threadPriority: 3
+          class: org.quartz.simpl.SimpleThreadPool
+
+
+
+

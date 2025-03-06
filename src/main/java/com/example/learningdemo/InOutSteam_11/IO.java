@@ -1,8 +1,12 @@
 package com.example.learningdemo.InOutSteam_11;
 
 import java.io.*;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
 *
@@ -69,71 +73,79 @@ import java.util.Arrays;
 public class IO {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         // 扫描目录下所有的文件
-        listAllFiles(new File("D:\\TestIO"));
+        List<File> fileList = new ArrayList<>();
+        listAllFiles(new File("D:\\TestIO"), fileList);
+        for (File file : fileList) {
+            Files.readAttributes(Paths.get(file.getPath()), BasicFileAttributes.class).creationTime();
+            System.out.println("111");
+        }
 
+
+        System.out.println("1111");
         // 复制文件并修改他的文件名
-        try {
-            copyFile("D:\\TestIO\\新建 DOC 文档.doc", "D:\\TestIO\\testIO\\新建 DOC 文档---复制.doc");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("以下测试文本读取信息-----------------------------------------------------------------------------------------------------------------------");
-        try {
-            readFileContent("D:\\TestIO\\新建文本文档.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("以下为测试可序列化类,实现了Serializable类-----------------------------------------------------------------------------------------------------------------------");
-        Integer[] data = new Integer[]{1, 2};
-        serializableClass a1 = new serializableClass(123, "abc", data);
-        String objectFile = "D:\\TestIO\\新建文本文档 (2).txt";
-        // 此处因为FileOutputStream只支持byte[]字符流格式而我们需要序列化对象所以使用ObjectOutputStream
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(objectFile));
-        // 序列化输出文件
-        objectOutputStream.writeObject(a1);
-        objectOutputStream.close();
-
-        // 输入流读取文件中序列化后的对象
-        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(objectFile));
-        serializableClass a2 = (serializableClass) objectInputStream.readObject();
-        objectInputStream.close();
-        System.out.println(a2);
-
-
-
-
-        System.out.println("以下为网络I/O-----------------------------------------------------------------------------------------------------------------------");
-        URL url = new URL("http://www.baidu.com");
-
-        /* 字节流 */
-        InputStream is = url.openStream();
-
-        /* 字符流 */
-        InputStreamReader isr = new InputStreamReader(is, "utf-8");
-
-        /* 提供缓存功能 */
-        BufferedReader br = new BufferedReader(isr);
-
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
-        }
-
-        br.close();
+//        try {
+//            copyFile("D:\\TestIO\\新建 DOC 文档.doc", "D:\\TestIO\\testIO\\新建 DOC 文档---复制.doc");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("以下测试文本读取信息-----------------------------------------------------------------------------------------------------------------------");
+//        try {
+//            readFileContent("D:\\TestIO\\新建文本文档.txt");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("以下为测试可序列化类,实现了Serializable类-----------------------------------------------------------------------------------------------------------------------");
+//        Integer[] data = new Integer[]{1, 2};
+//        serializableClass a1 = new serializableClass(123, "abc", data);
+//        String objectFile = "D:\\TestIO\\新建文本文档 (2).txt";
+//        // 此处因为FileOutputStream只支持byte[]字符流格式而我们需要序列化对象所以使用ObjectOutputStream
+//        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(objectFile));
+//        // 序列化输出文件
+//        objectOutputStream.writeObject(a1);
+//        objectOutputStream.close();
+//
+//        // 输入流读取文件中序列化后的对象
+//        ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(objectFile));
+//        serializableClass a2 = (serializableClass) objectInputStream.readObject();
+//        objectInputStream.close();
+//        System.out.println(a2);
+//
+//
+//
+//
+//        System.out.println("以下为网络I/O-----------------------------------------------------------------------------------------------------------------------");
+//        URL url = new URL("http://www.baidu.com");
+//
+//        /* 字节流 */
+//        InputStream is = url.openStream();
+//
+//        /* 字符流 */
+//        InputStreamReader isr = new InputStreamReader(is, "utf-8");
+//
+//        /* 提供缓存功能 */
+//        BufferedReader br = new BufferedReader(isr);
+//
+//        String line;
+//        while ((line = br.readLine()) != null) {
+//            System.out.println(line);
+//        }
+//
+//        br.close();
     }
 
     // 递归地列出一个目录下所有文件
-    public static void listAllFiles(File dir) {
+    public static void listAllFiles(File dir, List<File> fileList) {
         if (dir == null || !dir.exists()) {
             return;
         }
         if (dir.isFile()) {
             System.out.println(dir.getName());
+            fileList.add(dir);
             return;
         }
         for (File file : dir.listFiles()) {
-            listAllFiles(file);
+            listAllFiles(file, fileList);
         }
     }
 

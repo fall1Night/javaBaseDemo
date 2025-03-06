@@ -258,7 +258,7 @@ public class ExportTableInWord {
 
     /**
      * @Description: 跨行合并
-     * table要合并单元格的表格
+     *
      * col要合并哪一列的单元格
      * fromRow从哪一行开始合并单元格
      * toRow合并到哪一个行
